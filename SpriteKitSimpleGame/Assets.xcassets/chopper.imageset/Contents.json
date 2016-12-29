@@ -2,12 +2,12 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "projectile.png",
+      "filename" : "chopper.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "projectile@2x.png",
+      "filename" : "chopper@2x.png",
       "scale" : "2x"
     },
     {

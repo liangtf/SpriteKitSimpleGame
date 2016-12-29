@@ -15,6 +15,7 @@
 		AA556AED1E13AC310046DF5F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA556AEB1E13AC310046DF5F /* LaunchScreen.storyboard */; };
 		AA556B0F1E13AE630046DF5F /* Sounds in Resources */ = {isa = PBXBuildFile; fileRef = AA556B0E1E13AE630046DF5F /* Sounds */; };
 		AA556B111E13B6A90046DF5F /* GameOverScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA556B101E13B6A90046DF5F /* GameOverScene.swift */; };
+		AA556B131E13C0C70046DF5F /* PointMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA556B121E13C0C70046DF5F /* PointMgr.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 		AA556AEE1E13AC310046DF5F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA556B0E1E13AE630046DF5F /* Sounds */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Sounds; sourceTree = "<group>"; };
 		AA556B101E13B6A90046DF5F /* GameOverScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GameOverScene.swift; path = SpriteKitSimpleGame/GameOverScene.swift; sourceTree = "<group>"; };
+		AA556B121E13C0C70046DF5F /* PointMgr.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PointMgr.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +71,7 @@
 				AA556AE91E13AC310046DF5F /* Assets.xcassets */,
 				AA556AEB1E13AC310046DF5F /* LaunchScreen.storyboard */,
 				AA556AEE1E13AC310046DF5F /* Info.plist */,
+				AA556B121E13C0C70046DF5F /* PointMgr.swift */,
 			);
 			path = SpriteKitSimpleGame;
 			sourceTree = "<group>";
@@ -148,6 +151,7 @@
 			files = (
 				AA556AE31E13AC310046DF5F /* GameScene.swift in Sources */,
 				AA556AE51E13AC310046DF5F /* GameViewController.swift in Sources */,
+				AA556B131E13C0C70046DF5F /* PointMgr.swift in Sources */,
 				AA556B111E13B6A90046DF5F /* GameOverScene.swift in Sources */,
 				AA556ADD1E13AC310046DF5F /* AppDelegate.swift in Sources */,
 			);

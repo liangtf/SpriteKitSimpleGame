@@ -2,12 +2,12 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "player.png",
+      "filename" : "ambulance.png",
       "scale" : "1x"
     },
     {
       "idiom" : "universal",
-      "filename" : "player@2x.png",
+      "filename" : "ambulance@2x.png",
       "scale" : "2x"
     },
     {
