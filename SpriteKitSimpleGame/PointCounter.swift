@@ -9,16 +9,15 @@
 import Foundation
 
 
-class PointMgr {
+class PointCounter {
     let pointInit = 10;
     let pointTank = 1;
     let pointChopper = 3;
     let pointLost = -10;
     var pointCurrent = 10;
     
-    func reset() -> Bool {
+    func reset() {
         pointCurrent = pointInit
-        return true
     }
     
     func TankDestoried() -> Bool {
@@ -32,12 +31,12 @@ class PointMgr {
     }
     
     func AmbulanceDestoried() -> Bool {
-        pointCurrent = 0
-        return pointCurrent > 0
+        pointCurrent = -1
+        return pointCurrent >= 0
     }
     
     func BottomTouched() -> Bool {
         pointCurrent += pointLost
-        return pointCurrent > 0
+        return pointCurrent >= 0
     }
 }

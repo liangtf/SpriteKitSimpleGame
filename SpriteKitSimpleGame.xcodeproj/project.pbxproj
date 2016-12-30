@@ -15,7 +15,8 @@
 		AA556AED1E13AC310046DF5F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA556AEB1E13AC310046DF5F /* LaunchScreen.storyboard */; };
 		AA556B0F1E13AE630046DF5F /* Sounds in Resources */ = {isa = PBXBuildFile; fileRef = AA556B0E1E13AE630046DF5F /* Sounds */; };
 		AA556B111E13B6A90046DF5F /* GameOverScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA556B101E13B6A90046DF5F /* GameOverScene.swift */; };
-		AA556B131E13C0C70046DF5F /* PointMgr.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA556B121E13C0C70046DF5F /* PointMgr.swift */; };
+		AA556B131E13C0C70046DF5F /* PointCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA556B121E13C0C70046DF5F /* PointCounter.swift */; };
+		AAF5352A1E16052C00114CBA /* MathUtility.swift in Sources */ = {isa = PBXBuildFile; fileRef = AAF535291E16052C00114CBA /* MathUtility.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,8 +29,9 @@
 		AA556AEC1E13AC310046DF5F /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		AA556AEE1E13AC310046DF5F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA556B0E1E13AE630046DF5F /* Sounds */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Sounds; sourceTree = "<group>"; };
-		AA556B101E13B6A90046DF5F /* GameOverScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = GameOverScene.swift; path = SpriteKitSimpleGame/GameOverScene.swift; sourceTree = "<group>"; };
-		AA556B121E13C0C70046DF5F /* PointMgr.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PointMgr.swift; sourceTree = "<group>"; };
+		AA556B101E13B6A90046DF5F /* GameOverScene.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameOverScene.swift; sourceTree = "<group>"; };
+		AA556B121E13C0C70046DF5F /* PointCounter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PointCounter.swift; sourceTree = "<group>"; };
+		AAF535291E16052C00114CBA /* MathUtility.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MathUtility.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -46,7 +48,6 @@
 		AA556AD01E13AC310046DF5F = {
 			isa = PBXGroup;
 			children = (
-				AA556B101E13B6A90046DF5F /* GameOverScene.swift */,
 				AA556ADB1E13AC310046DF5F /* SpriteKitSimpleGame */,
 				AA556ADA1E13AC310046DF5F /* Products */,
 			);
@@ -63,6 +64,8 @@
 		AA556ADB1E13AC310046DF5F /* SpriteKitSimpleGame */ = {
 			isa = PBXGroup;
 			children = (
+				AA556B101E13B6A90046DF5F /* GameOverScene.swift */,
+				AAF535291E16052C00114CBA /* MathUtility.swift */,
 				AA556B0E1E13AE630046DF5F /* Sounds */,
 				AA556ADC1E13AC310046DF5F /* AppDelegate.swift */,
 				AA556AE21E13AC310046DF5F /* GameScene.swift */,
@@ -71,7 +74,7 @@
 				AA556AE91E13AC310046DF5F /* Assets.xcassets */,
 				AA556AEB1E13AC310046DF5F /* LaunchScreen.storyboard */,
 				AA556AEE1E13AC310046DF5F /* Info.plist */,
-				AA556B121E13C0C70046DF5F /* PointMgr.swift */,
+				AA556B121E13C0C70046DF5F /* PointCounter.swift */,
 			);
 			path = SpriteKitSimpleGame;
 			sourceTree = "<group>";
@@ -108,6 +111,7 @@
 				TargetAttributes = {
 					AA556AD81E13AC310046DF5F = {
 						CreatedOnToolsVersion = 8.1;
+						DevelopmentTeam = 3SY78X3XK2;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -151,8 +155,9 @@
 			files = (
 				AA556AE31E13AC310046DF5F /* GameScene.swift in Sources */,
 				AA556AE51E13AC310046DF5F /* GameViewController.swift in Sources */,
-				AA556B131E13C0C70046DF5F /* PointMgr.swift in Sources */,
+				AA556B131E13C0C70046DF5F /* PointCounter.swift in Sources */,
 				AA556B111E13B6A90046DF5F /* GameOverScene.swift in Sources */,
+				AAF5352A1E16052C00114CBA /* MathUtility.swift in Sources */,
 				AA556ADD1E13AC310046DF5F /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -276,6 +281,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 3SY78X3XK2;
 				INFOPLIST_FILE = SpriteKitSimpleGame/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.nocompany.steve.SpriteKitSimpleGame;
@@ -288,6 +294,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				DEVELOPMENT_TEAM = 3SY78X3XK2;
 				INFOPLIST_FILE = SpriteKitSimpleGame/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.nocompany.steve.SpriteKitSimpleGame;
@@ -315,6 +322,7 @@
 				AA556AF31E13AC310046DF5F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

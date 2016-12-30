@@ -1,54 +1,38 @@
 import SpriteKit
 
-//struct PhysicsCategory {
-//    static let None      : UInt32 = 0
-//    static let All       : UInt32 = UInt32.max
-//    static let Monster   : UInt32 = 0b1       // 1
-//    static let Projectile: UInt32 = 0b10      // 2
-//}
-
-func + (left: CGPoint, right: CGPoint) -> CGPoint {
-    return CGPoint(x: left.x + right.x, y: left.y + right.y)
+enum MonsterCategory : String {
+    case Tank = "tank"
+    case Chopper = "chopper"
+    case Ambulance = "ambulance"
 }
 
-func - (left: CGPoint, right: CGPoint) -> CGPoint {
-    return CGPoint(x: left.x - right.x, y: left.y - right.y)
+struct CrossingDuration {
+    static let ChopperMinSpeed_Duration:Float = 6.0
+    static let ChopperMaxSpeed_Duration:Float = 5.0
+    static let TankMinSpeed_Duration:Float = 8.0
+    static let TankMaxSpeed_Duration:Float = 7.0
+    static let AmbulanceMinSpeed_Duration:Float = 10.0
+    static let AmbulanceMaxSpeed_Duration:Float = 9.0
 }
 
-func * (point: CGPoint, scalar: CGFloat) -> CGPoint {
-    return CGPoint(x: point.x * scalar, y: point.y * scalar)
-}
-
-func / (point: CGPoint, scalar: CGFloat) -> CGPoint {
-    return CGPoint(x: point.x / scalar, y: point.y / scalar)
-}
-
-#if !(arch(x86_64) || arch(arm64))
-    func sqrt(a: CGFloat) -> CGFloat {
-        return CGFloat(sqrtf(Float(a)))
-    }
-#endif
-
-extension CGPoint {
-    func length() -> CGFloat {
-        return sqrt(x*x + y*y)
-    }
-    
-    func normalized() -> CGPoint {
-        return self / length()
-    }
+struct WaitingDuration {
+    static let TankWaitingDuration:Double = 1.0
+    static let ChopperWaitingDuration:Double = 1.5
+    static let AmbulanceWaitingDuration:Double = 2.0
 }
 
 // images: house, tank, chopper, ambulance
 
-// SKPhysicsContactDelegate
 class GameScene: SKScene  {
     
     // create home on the bottom with a house image
     let house = SKSpriteNode(imageNamed: "house")
+    let points = SKLabelNode(text: "score: 10")
+    let pointCounter = PointCounter()
     
     override func didMove(to view: SKView) {
         
+        pointCounter.reset()
         house.name = "house"
         // set background color
         backgroundColor = SKColor.white
@@ -57,25 +41,35 @@ class GameScene: SKScene  {
         // add it to scene
         addChild(house)
         
-
+        // add point label
+        points.fontSize = 12
+        points.fontColor = SKColor.white
+        points.position = CGPoint(x: 0, y: -points.frame.size.height/2 + 2);
+        
+        let background = SKSpriteNode (color: UIColor.darkGray, size:CGSize(width: points.frame.size.width + 5, height: points.frame.size.height + 2))
+        background.position = CGPoint(x:size.width - background.size.width/2 - 10, y: background.size.height/2 + 5 )
+        background.addChild( points )
+        addChild(background)
+        
+        
         run(SKAction.repeatForever(
             SKAction.sequence([
-                SKAction.run(addTank),
-                SKAction.wait(forDuration: 1.0)
+                SKAction.run({self.addMonster(category: MonsterCategory.Tank)}),
+                SKAction.wait(forDuration: WaitingDuration.TankWaitingDuration)
                 ])
         ))
         
         run(SKAction.repeatForever(
             SKAction.sequence([
-                SKAction.run(addChopper),
-                SKAction.wait(forDuration: 1.5)
+                SKAction.run({self.addMonster(category: MonsterCategory.Chopper)}),
+                SKAction.wait(forDuration: WaitingDuration.ChopperWaitingDuration)
                 ])
         ))
         
         run(SKAction.repeatForever(
             SKAction.sequence([
-                SKAction.run(addAmbulance),
-                SKAction.wait(forDuration: 2.0)
+                SKAction.run({self.addMonster(category: MonsterCategory.Ambulance)}),
+                SKAction.wait(forDuration: WaitingDuration.AmbulanceWaitingDuration)
                 ])
         ))
         
@@ -84,204 +78,69 @@ class GameScene: SKScene  {
         addChild(backgroundMusic)
     }
     
-    func random() -> CGFloat {
-        return CGFloat(Float(arc4random()) / 0xFFFFFFFF)
-    }
-    
-    func random(min: CGFloat, max: CGFloat) -> CGFloat {
-        let result = random() * (max - min) + min
-        print("min: " + min.description + " max:" + max.description + " result: " + result.description)
-        return result
-    }
-    
-    func random_int(min: Int, max: Int) -> Int {
-        return Int(arc4random_uniform(UInt32(max))) + min
-    }
-    
-    func getAvailableLocation( Xes: [SKSpriteNode],width: CGFloat) -> CGFloat {
-        var Xes = Xes
-        var actualX :CGFloat = 0.0
-        var arrayActualX = [CGFloat]()
-        if Xes.count > 0 {
-            // find a place that has enough space for a monster.
-            Xes.sort(by: { $0.position.x < $1.position.x })
+    func addMonster(category: MonsterCategory) {
+        
+        let monsterName:String = category.rawValue
+        
+        // Create sprite
+        let monster = SKSpriteNode(imageNamed: monsterName)
+        monster.name = monsterName
+        
+        // Determine where to spawn the monster along the X axis
+        var arrayX = [SKSpriteNode]()
+        for child in self.children {
+            // except house node
+            if child is SKSpriteNode && child.name != "house" {
+                arrayX.append(child as! SKSpriteNode);
+            }
+        }
+        
+        let actualX = MathUtility.getAvailableLocation(Xes: arrayX, screenSize: size, monsterWidth: monster.size.width)
+        if actualX == 0 {
+            return
+        }
 
-            //            dump(arrayX)
-            
-            print("The objects are on screen >>>")
-            for child in Xes {
-                print(child.position.x)
-            }
-            print("<<<<<<<")
-            for i in 0...Xes.count - 1 {
-                if i == 0 && Xes[i].position.x - Xes[i].size.width/2 - width > 0 {
-                    arrayActualX.append(random(min: 0 + width/2,
-                                               max: Xes[i].position.x - Xes[i].size.width/2 - width/2))
+        // Position the monster slightly off-screen along the top edge,
+        // and along a random position along the X axis as calculated above
+        monster.position = CGPoint(x: actualX, y: size.height + monster.size.height/2)
+        
+        // Add the monster to the scene
+        addChild(monster)
+        
+        var minSpeedDuration:Float = 0.0
+        var maxSpeedDuration:Float = 0.0
+        
+        switch  category {
+        case .Tank:
+            minSpeedDuration = CrossingDuration.TankMinSpeed_Duration
+            maxSpeedDuration = CrossingDuration.TankMaxSpeed_Duration
+        case .Chopper:
+            minSpeedDuration = CrossingDuration.ChopperMinSpeed_Duration
+            maxSpeedDuration = CrossingDuration.ChopperMaxSpeed_Duration
+        case .Ambulance:
+            minSpeedDuration = CrossingDuration.AmbulanceMinSpeed_Duration
+            maxSpeedDuration = CrossingDuration.AmbulanceMaxSpeed_Duration
+        }
+        
+        
+        // Determine speed of the monster
+        let actualDuration = MathUtility.random(min: CGFloat(minSpeedDuration), max: CGFloat(maxSpeedDuration))
+        
+        // Create the actions
+        let actionMove = SKAction.move(to: CGPoint(x: actualX, y: -monster.size.height/2), duration: TimeInterval(actualDuration))
+        let actionMoveDone = SKAction.removeFromParent()
+        let loseAction = SKAction.run() {
+            if category != MonsterCategory.Ambulance {
+                if self.pointCounter.BottomTouched() == false {
+                    self.showGameOverScene();
                 }
-                
-                if i == Xes.count - 1 && size.width - Xes[i].position.x - Xes[i].size.width/2 - width > 0 {
-                    arrayActualX.append(random(min: Xes[i].position.x + Xes[i].size.width/2 + width/2,
-                                               max: size.width - width/2))
-                    
-                }
-                
-                if Xes.count > 1 && i != Xes.count - 1 && Xes[i+1].position.x - Xes[i].position.x - Xes[i+1].size.width/2 - Xes[i].size.width/2 - width > 0 {
-                    arrayActualX.append(random(min: Xes[i].position.x + Xes[i].size.width/2 + width/2,
-                                               max: Xes[i+1].position.x - Xes[i+1].size.width/2 - width / 2))
-                }
-            }
-            
-            if arrayActualX.count > 0 {
-                print("The objects will be on screen =====")
-                dump(arrayActualX)
-                let rndidx = random_int(min: 1, max: arrayActualX.count )
-                print(rndidx)
-                actualX = arrayActualX[rndidx-1]
-                print(actualX)
-                print("=====")
             } else {
-                print("WARNING==== WARNING=== WARNING... NO ENOUGH SPACE")
-                actualX = 0.0
+                
             }
-            
-        }
-        else {
-            actualX = random(min: width/2, max: size.width - width/2)
-        }
-        return actualX;
-    }
-    
-    
-    func addTank() {
-        // Create sprite
-        let monster = SKSpriteNode(imageNamed: "tank")
-        monster.name = "tank"
-        // Determine where to spawn the monster along the Y axis
-//        let actualY = random(min: monster.size.height/2, max: size.height - monster.size.height/2)
-        var arrayX = [SKSpriteNode]()
-        for child in self.children {
-            if child is SKSpriteNode && child.name != "house" {
-                arrayX.append(child as! SKSpriteNode);
-            }
-        }
-        
-        let actualX = getAvailableLocation(Xes: arrayX, width: monster.size.width)
-        if actualX == 0 {
-            return
-        }
 
-        // Position the monster slightly off-screen along the right edge,
-        // and along a random position along the Y axis as calculated above
-        monster.position = CGPoint(x: actualX, y: size.height + monster.size.height/2)
-        
-        // Add the monster to the scene
-        addChild(monster)
-        
-        // Determine speed of the monster
-        let actualDuration = random(min: CGFloat(5.0), max: CGFloat(6.0))
-        
-        // Create the actions
-//        let actionMove = SKAction.move(to: CGPoint(x: -monster.size.width/2, y: actualY), duration: TimeInterval(actualDuration))
-        let actionMove = SKAction.move(to: CGPoint(x: actualX, y: -monster.size.height/2), duration: TimeInterval(actualDuration))
-        
-        let actionMoveDone = SKAction.removeFromParent()
-        let loseAction = SKAction.run() {
-            // points decrease
-//            let reveal = SKTransition.flipHorizontal(withDuration: 0.5)
-//            let gameOverScene = GameOverScene(size: self.size, won: false)
-//            self.view?.presentScene(gameOverScene, transition: reveal)
-            // check points
-            
-            //
+            self.points.text = "score: " + self.pointCounter.pointCurrent.description
         }
         monster.run(SKAction.sequence([actionMove, loseAction, actionMoveDone]))
-        
-    }
-    
-    
-    func addChopper() {
-        
-        // Create sprite
-        let monster = SKSpriteNode(imageNamed: "chopper")
-        monster.name = "chopper"
-        // Determine where to spawn the monster along the Y axis
-        //        let actualY = random(min: monster.size.height/2, max: size.height - monster.size.height/2)
-
-        var arrayX = [SKSpriteNode]()
-        for child in self.children {
-            if child is SKSpriteNode && child.name != "house" {
-                arrayX.append(child as! SKSpriteNode);
-            }
-        }
-        
-        let actualX = getAvailableLocation(Xes: arrayX, width: monster.size.width)
-        if actualX == 0 {
-            return
-        }
-        // Position the monster slightly off-screen along the right edge,
-        // and along a random position along the Y axis as calculated above
-        monster.position = CGPoint(x: actualX, y: size.height + monster.size.height/2)
-        
-        // Add the monster to the scene
-        addChild(monster)
-        
-        // Determine speed of the monster
-        let actualDuration = random(min: CGFloat(3.0), max: CGFloat(4.0))
-        
-        // Create the actions
-        //        let actionMove = SKAction.move(to: CGPoint(x: -monster.size.width/2, y: actualY), duration: TimeInterval(actualDuration))
-        let actionMove = SKAction.move(to: CGPoint(x: actualX, y: -monster.size.height/2), duration: TimeInterval(actualDuration))
-        
-        let actionMoveDone = SKAction.removeFromParent()
-        let loseAction = SKAction.run() {
-            //            let reveal = SKTransition.flipHorizontal(withDuration: 0.5)
-            //            let gameOverScene = GameOverScene(size: self.size, won: false)
-            //            self.view?.presentScene(gameOverScene, transition: reveal)
-        }
-        monster.run(SKAction.sequence([actionMove, loseAction, actionMoveDone]))
-        
-    }
-    
-    func addAmbulance() {
-        
-        // Create sprite
-        let monster = SKSpriteNode(imageNamed: "ambulance")
-        monster.name = "ambulance"
-        // Determine where to spawn the monster along the Y axis
-        //        let actualY = random(min: monster.size.height/2, max: size.height - monster.size.height/2)
-        var arrayX = [SKSpriteNode]()
-        for child in self.children {
-            if child is SKSpriteNode && child.name != "house" {
-                arrayX.append(child as! SKSpriteNode);
-            }
-        }
-        
-        let actualX = getAvailableLocation(Xes: arrayX, width: monster.size.width)
-        if actualX == 0 {
-            return
-        }
-        // Position the monster slightly off-screen along the right edge,
-        // and along a random position along the Y axis as calculated above
-        monster.position = CGPoint(x: actualX, y: size.height + monster.size.height/2)
-        
-        // Add the monster to the scene
-        addChild(monster)
-        
-        // Determine speed of the monster
-        let actualDuration = random(min: CGFloat(7.0), max: CGFloat(8.0))
-        
-        // Create the actions
-        //        let actionMove = SKAction.move(to: CGPoint(x: -monster.size.width/2, y: actualY), duration: TimeInterval(actualDuration))
-        let actionMove = SKAction.move(to: CGPoint(x: actualX, y: -monster.size.height/2), duration: TimeInterval(actualDuration))
-        
-        let actionMoveDone = SKAction.removeFromParent()
-        let loseAction = SKAction.run() {
-            //            let reveal = SKTransition.flipHorizontal(withDuration: 0.5)
-            //            let gameOverScene = GameOverScene(size: self.size, won: false)
-            //            self.view?.presentScene(gameOverScene, transition: reveal)
-        }
-        monster.run(SKAction.sequence([actionMove, loseAction, actionMoveDone]))
-        
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -289,26 +148,33 @@ class GameScene: SKScene  {
             let touchLocation = touch.location(in: self)
             let touchedNodes = self.nodes (at: touchLocation)
             for touchedNode in touchedNodes {
+                var alive = true
                 if touchedNode.name == "tank" {
                     touchedNode.removeFromParent()
-                    print("hit! tank removed.")
-                }
-                
-                if touchedNode.name == "chopper" {
+//                    print("hit! tank removed.")
+                    alive = pointCounter.TankDestoried()
+                }else if touchedNode.name == "chopper" {
                     touchedNode.removeFromParent()
-                    print("hit! chopper removed.")
-                }
-                
-                if touchedNode.name == "ambulance" {
+//                    print("hit! chopper removed.")
+                    alive = pointCounter.ChopperDestoried()
+                } else if touchedNode.name == "ambulance" {
                     touchedNode.removeFromParent()
-                    print("hit! GameOver.")
-                    let reveal = SKTransition.flipHorizontal(withDuration: 0.5)
-                    let gameOverScene = GameOverScene(size: self.size, won: false)
-                    self.view?.presentScene(gameOverScene, transition: reveal)
+//                    print("hit! GameOver.")
+                    alive = pointCounter.AmbulanceDestoried()
                 }
-                
+                self.points.text = "score: " + self.pointCounter.pointCurrent.description
+                if alive == false {
+                    showGameOverScene();
+                    return;
+                }
             }
         }
+    }
+    
+    func showGameOverScene() {
+        let reveal = SKTransition.flipHorizontal(withDuration: 0.5)
+        let gameOverScene = GameOverScene(size: self.size, won: false)
+        self.view?.presentScene(gameOverScene, transition: reveal)
     }
     
 }
